@@ -1,4 +1,4 @@
-# Server Security Toolkit
+# Keeper Security MOTD
 
 <table>
 <tr>
@@ -9,64 +9,15 @@
 
 > **Hey there!** This is an unofficial, community-created project. The MOTD theme is inspired by Keeper Security but is **not affiliated with, endorsed by, or connected to Keeper Security, Inc.** Just a fan having fun with terminal aesthetics!
 
-A collection of scripts that make your Linux server login experience way cooler while keeping things secure.
+A stylish Message of the Day (MOTD) script that makes your Linux server login look way cooler.
 
 ---
 
-## What's This All About?
-
-### SSH Doorknock Firewall
-Think of it as a **VPN without the VPN** - SSH authentication grants your IP full access, no extra software needed.
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    SSH DOORKNOCK FIREWALL                           │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│   INTERNET                        YOUR SERVER                       │
-│   ════════                        ═══════════                       │
-│                                                                     │
-│   Attacker ──────────────────X────► All Ports (BLOCKED)             │
-│   (no SSH)                    │                                     │
-│                               │    ┌─────────────────────┐          │
-│                               └────│ DOCKER-USER: DROP   │          │
-│                                    └─────────────────────┘          │
-│                                                                     │
-│   You ─────► SSH (port 22) ──────► PAM detects login                │
-│   (with key)        │              │                                │
-│                     │              ▼                                │
-│                     │         ┌─────────────────────┐               │
-│                     │         │ pam-whitelist-open  │               │
-│                     │         │ - Add ACCEPT rule   │               │
-│                     │         │ - Add DOCKER RETURN │               │
-│                     │         └─────────────────────┘               │
-│                     │              │                                │
-│                     │              ▼                                │
-│                     └────────► ALL PORTS (ALLOWED) ◄── You only!    │
-│                                                                     │
-│   On logout ──────────────────────► pam-whitelist-close             │
-│                                     - Remove rules                  │
-│                                     - Back to blocked               │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-**The magic:**
-1. Only SSH (port 22) can get through initially
-2. Everything else? Blocked. Sorry, not sorry.
-3. Login via SSH? Boom - **ALL ports** open for your IP
-4. Logout? Access revoked. Like you were never there.
-5. **No static whitelist IPs** - purely dynamic via SSH "doorknock"
-
-### MOTD (Message of the Day)
-Because staring at a boring login prompt is so last decade. Get greeted with style!
-
-### Requirements
+## Requirements
 
 - Linux (any flavor - Debian, Ubuntu, RHEL, CentOS, Fedora, Arch, whatever)
-- iptables
-- Root access (sudo works too)
 - Bash or Zsh
+- Root access (or adjust paths accordingly)
 - Optional: fail2ban (makes threat detection cooler)
 - Optional: Docker (if you want container stats)
 
@@ -74,52 +25,19 @@ Because staring at a boring login prompt is so last decade. Get greeted with sty
 
 ## Quick Start
 
-### SSH Doorknock Firewall Setup (PAM Method - Recommended)
-
-The PAM method is the most reliable - it triggers on actual SSH session events, not shell startup.
-
-**1. Copy scripts to /root:**
 ```bash
-cp security/pam-whitelist-open.sh /root/
-cp security/pam-whitelist-close.sh /root/
-chmod +x /root/pam-whitelist-*.sh
-```
+# Clone the repo
+git clone https://github.com/jlima8900/keeper-security-motd.git
+cd keeper-security-motd
 
-**2. Configure PAM for SSH:**
-```bash
-# Add to /etc/pam.d/sshd:
-echo "session optional pam_exec.so type=open_session /root/pam-whitelist-open.sh" >> /etc/pam.d/sshd
-echo "session optional pam_exec.so type=close_session /root/pam-whitelist-close.sh" >> /etc/pam.d/sshd
-```
-
-**3. Set up Docker firewall (if using Docker):**
-```bash
-cp security/docker-user-firewall-init.sh /root/
-cp security/docker-user-firewall.service /etc/systemd/system/
-chmod +x /root/docker-user-firewall-init.sh
-systemctl daemon-reload
-systemctl enable docker-user-firewall.service
-systemctl start docker-user-firewall.service
-```
-
-**4. Test it:**
-```bash
-# Open a NEW SSH session (keep current one open!)
-# Check the whitelist log:
-tail -f /var/log/ssh-whitelist.log
-```
-
-### Alternative: Shell-based Setup
-```bash
-chmod +x setup-ssh-whitelist.sh
-./setup-ssh-whitelist.sh
-```
-
-### MOTD Setup
-```bash
+# Make it executable
 chmod +x .keeper_motd.sh
-# Add to .bashrc or .zshrc:
-# source ~/.keeper_motd.sh
+
+# Add to your shell config (.bashrc or .zshrc)
+echo 'source ~/.keeper_motd.sh' >> ~/.bashrc
+
+# Copy files to home directory
+cp -r .keeper_motd.sh .keeper_motd.d password_humor.txt ~/
 ```
 
 ---
@@ -231,29 +149,19 @@ FAIL2BAN_LOG=/var/log/fail2ban.log
 
 ---
 
-## Files in This Repo
-
-### Security Scripts (`security/`)
+## Files
 
 | File | Purpose |
 |------|---------|
-| `pam-whitelist-open.sh` | PAM script - grants ALL port access on SSH login |
-| `pam-whitelist-close.sh` | PAM script - revokes access when last session ends |
-| `docker-user-firewall-init.sh` | Boot script to add DROP rule to DOCKER-USER chain |
-| `docker-user-firewall.service` | Systemd service for Docker firewall persistence |
-| `auto-whitelist-on-ssh.sh` | Alternative: shell-based whitelist (via .bashrc) |
-| `auto-remove-whitelist.sh` | Alternative: shell-based removal (via .bash_logout) |
-| `safe-firewall-hardening.sh` | Interactive firewall hardening with rollback |
-
-### Root Level Files
-
-| File | Purpose |
-|------|---------|
-| `setup-ssh-whitelist.sh` | One-click firewall setup |
 | `.keeper_motd.sh` | Main MOTD script |
 | `.keeper_motd.d/` | All the modules and framework |
 | `password_humor.txt` | 251 jokes about passwords |
-| `SSH-WHITELIST-FIREWALL.md` | Detailed firewall docs |
+
+---
+
+## Related Projects
+
+Looking for SSH-based firewall whitelisting? Check out [ssh-doorknock-firewall](https://github.com/jlima8900/ssh-doorknock-firewall) - dynamic IP whitelisting via SSH authentication.
 
 ---
 
