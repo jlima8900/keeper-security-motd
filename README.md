@@ -2,8 +2,8 @@
 
 <table>
 <tr>
-<td><img width="380" alt="MOTD Screenshot 1" src="https://github.com/user-attachments/assets/27728c48-7fe3-42f3-88cf-a393f04164b9" /></td>
-<td><img width="380" alt="MOTD Screenshot 2" src="https://github.com/user-attachments/assets/6f08f19d-d00b-4051-b662-2640a52bc6a2" /></td>
+<td><img width="380" alt="MOTD Screenshot 1" src="screenshots/screenshot1.png" /></td>
+<td><img width="380" alt="MOTD Screenshot 2" src="screenshots/screenshot2.png" /></td>
 </tr>
 </table>
 
