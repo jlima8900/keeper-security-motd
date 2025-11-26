@@ -1,0 +1,6 @@
+# Ignore cache files
+cache/*
+!cache/.gitkeep
+
+# Ignore log files
+*.log
